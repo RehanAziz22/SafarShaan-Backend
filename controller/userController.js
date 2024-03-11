@@ -42,7 +42,7 @@ const UserController = {
                 });
             }
 
-            const newUser = await userModel.create(objToSend);
+            const user = await userModel.create(objToSend);
             const otp = 1234
             // const otp = otpGenerator.generate(6, { lowerCaseAlphabets: false, specialChars: false, upperCaseAlphabets: false, digits: true })
             const cDate = new Date();
@@ -54,7 +54,8 @@ const UserController = {
 
             return response.status(200).json({
                 success: true,
-                msg: "OTP Send Successfully"
+                msg: "OTP Send Successfully",
+                user
             })
         }
         catch (error) {
