@@ -130,7 +130,7 @@ const UserController = {
     //         const hashPassword = await bcrypt.hash(password, 10);
 
     //         const objToSend = {
-    //             first_name: firstName,
+    //             firstName: firstName,
     //             last_name: lastName,
     //             email,
     //             password: hashPassword,
@@ -217,7 +217,7 @@ const UserController = {
     //         const hashPassword = await bcrypt.hash(password, 10); // Use async/await for bcrypt
 
     //         const objToSend = {
-    //             first_name: firstName,
+    //             firstName: firstName,
     //             last_name: lastName,
     //             email,
     //             password: hashPassword,
@@ -444,7 +444,7 @@ const UserController = {
     //         }
 
     //         const objToSend = {
-    //             first_name: firstName,
+    //             firstName: firstName,
     //             last_name: lastName,
     //             email: email,
     //             password: password,
@@ -486,7 +486,7 @@ const UserController = {
             }
 
             const objToSend ={
-                first_name:firstName,
+                firstName:firstName,
                 email
             }
             const updatedUser = await userModel.findByIdAndUpdate(
