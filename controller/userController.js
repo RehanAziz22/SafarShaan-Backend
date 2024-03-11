@@ -6,6 +6,7 @@ const nodemailer = require("nodemailer");
 const jwt = require('jsonwebtoken')
 // const twilio = require("twilio")
 const { response } = require('express');
+const mongoose = require("mongoose");
 // const sendMail = require("./sendMail.js");
 require('dotenv').config();
 // const accountSid = "AC3527f60cf55606add423c4a531957524";
@@ -392,33 +393,42 @@ const UserController = {
     //         });
     //     }
     // },
-    singleUserGet: (request, response) => {
-        // console.log(request.params,"params")
-        // const {userID} = request.params;
-        // console.log(
-        //     "mongoes.Types.ObjectId(userID)",
-        //     mongoes.Types.ObjectId(userID)
-        // );
-
-
-        const { id } = request.query;
-
-        userModel.findById(id, (error, data) => {
-            if (error) {
-                response.json({
-                    message: `Internal error:${error}`,
-                    status: false,
-                });
-            } else {
-                console.log("data", data)
-                response.json({
-                    message: `user successfully get`,
-                    data: data,
-                    status: true,
-                });
-            }
-        })
-    },
+    singleUserGet: async (request, response) => {
+        try {
+          const {id} = request.query; // Assuming you're using `id` from the query string
+      
+        //   Validate ID format (optional, but recommended for security)
+          if (!mongoose.Types.ObjectId.isValid(id)) {
+            return response.json({
+              message: 'Invalid user ID format',
+              status: false,
+            });
+          }
+      
+          const user = await userModel.findById(id); // Use await to wait for the promise
+      
+          if (user) {
+            console.log("data", user); // User data will be in `user` variable
+            response.json({
+              message: 'User successfully retrieved',
+              data: user,
+              status: true,
+            });
+          } else {
+            response.json({
+              message: 'User not found',
+              status: false,
+            });
+          }
+        } catch (error) {
+          console.error(error); // Log the error for debugging
+          response.json({
+            message: 'Internal error',
+            status: false,
+          });
+        }
+      },
+      
     // userCreate: async (request, response) => {
     //     try {
     //         // console.log(request.body)

@@ -15,11 +15,17 @@ const bcrypt = require('bcryptjs');
 const UserController = require('./controller/userController.js');
 const PORT = process.env.PORT || 5000;
 
-const DBURI = process.env.DBURI
+// const DBURI = process.env.DBURI
  //"mongodb+srv://rehan:admin@cluster0.j1r6kfp.mongodb.net/?retryWrites=true&w=majority";
-mongoose.connect(DBURI)
-    .then((res) => console.log("mongo DB connected"))
-    .catch((err) => console.log("DB ERROE", err));
+const connectDB = async ()=>{
+    try {
+        const conn = await mongoose.connect(process.env.DBURI);
+        console.log(`MongoDB Connected: ${conn.connection.host}`);
+      } catch (error) {
+        console.log(error);
+        process.exit(1);
+      }
+}
 
 //BODY-PARSER
 app.use(cors())
@@ -30,11 +36,13 @@ app.use('/api',userRouter)
 // app.use('/api',otpRouter)
 
 app.get('/',(req,res)=>{
-    res.send("test success")
+    res.send("SaffarShan Working Fine")
 })
 // app.post("/api/send-otp", UserController.sendOTP)
 // app.get("/mail", sendMail);
-app.listen(PORT,()=>{
-    console.log("server is running in " + PORT)
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log("Server is running on Port"+PORT);
+        console.log("listening for requests");
+    })
 })
-
