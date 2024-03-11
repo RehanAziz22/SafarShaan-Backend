@@ -46,7 +46,7 @@ const UserController = {
             const otp = 1234
             // const otp = otpGenerator.generate(6, { lowerCaseAlphabets: false, specialChars: false, upperCaseAlphabets: false, digits: true })
             const cDate = new Date();
-            await otpModel.findOneAndUpdate(
+            const userOtp = await otpModel.findOneAndUpdate(
                 { mobileNumber },
                 { otp, otpExpiration: new Date(cDate.getDate()) },
                 { upsert: true, new: true, setDefaultOnInsert: true }
@@ -55,7 +55,8 @@ const UserController = {
             return response.status(200).json({
                 success: true,
                 msg: "OTP Send Successfully",
-                user
+                user,
+                userOtp
             })
         }
         catch (error) {
@@ -63,6 +64,59 @@ const UserController = {
             return response.json({
                 message: 'Internal server error',
                 status: false,
+            });
+        }
+    },
+
+    resendOTP: async (request, response) => {
+        try {
+            const { mobileNumber } = request.body; // Assuming mobile number is in query string
+
+            // Validation (optional but recommended)
+            // if (!mobileNumber || !/^\d{10}$/.test(mobileNumber)) {
+            //     return response.status(400).json({
+            //         success: false,
+            //         msg: 'Invalid mobile number format. Please provide a 10-digit number.'
+            //     });
+            // }
+
+            const currentTime = new Date();
+            const resendWindow = 1 * 60 * 1000; // 1 minute in milliseconds
+
+            // Check for recent OTP usage
+            const existingOtp = await otpModel.findOne({ mobileNumber });
+            if (existingOtp && (currentTime - existingOtp.otpExpiration) < resendWindow) {
+                return response.status(429).json({
+                    success: false,
+                    msg: 'OTP resend limit reached. Please try again in 1 minute.'
+                });
+            }
+
+            // Generate and update OTP
+            // const otp = otpGenerator.generate(6, { lowerCaseAlphabets: false, specialChars: false, upperCaseAlphabets: false, digits: true });
+            const otp = 1234
+            const otpExpiration = new Date(currentTime.getTime() + 15 * 60 * 1000); // 15 minutes
+
+            const updatedUserOtp = await otpModel.findOneAndUpdate(
+                { mobileNumber },
+                { otp, otpExpiration },
+                { upsert: true, new: true, setDefaultOnInsert: true }
+            );
+
+            // Send OTP via appropriate channel (e.g., SMS, email)
+            // Replace this with your implementation for sending the OTP
+            console.log(`Sending OTP ${otp} to ${mobileNumber}`);
+
+            return response.status(200).json({
+                success: true,
+                msg: 'OTP resent successfully.',
+                data: updatedUserOtp
+            });
+        } catch (error) {
+            console.error(error);
+            response.status(500).json({
+                success: false,
+                msg: 'Internal server error.'
             });
         }
     },
@@ -325,7 +379,7 @@ const UserController = {
 
 
 
-            const user = await userModel.findOne({ _id:id }); // Use async/await for findOne
+            const user = await userModel.findOne({ _id: id }); // Use async/await for findOne
             console.log(user)
             const isPinMatch = await bcrypt.compare(pin, user.pin); // Use async/await for compare
 
@@ -341,6 +395,41 @@ const UserController = {
                 status: true,
                 user,
             });
+        }
+        catch (error) {
+            console.error(error); // Log the error for debugging
+            return response.json({
+                message: 'Internal server error',
+                status: false,
+            });
+        }
+    },
+    verifyUserOtp: async (request, response) => {
+        try {
+            // console.log(request.body, "request.body");
+
+            const { mobileNumber, otp } = request.body;
+
+
+
+            const otpUser = await otpModel.findOne({ mobileNumber }); // Use async/await for findOne
+            const user = await userModel.findOne({ mobileNumber }); // Use async/await for findOne
+            console.log(user)
+            // Use async/await for compare
+
+            if (otpUser.otp == otp) {
+
+                return response.json({
+                    message: 'OTP Matched User successfully Verified',
+                    status: true,
+                    user,
+                });
+            } else {
+                return response.json({
+                    message: 'Invalid OTP',
+                    status: false,
+                });
+            }
         }
         catch (error) {
             console.error(error); // Log the error for debugging
@@ -396,40 +485,40 @@ const UserController = {
     // },
     singleUserGet: async (request, response) => {
         try {
-          const {id} = request.query; // Assuming you're using `id` from the query string
-      
-        //   Validate ID format (optional, but recommended for security)
-          if (!mongoose.Types.ObjectId.isValid(id)) {
-            return response.json({
-              message: 'Invalid user ID format',
-              status: false,
-            });
-          }
-      
-          const user = await userModel.findById(id); // Use await to wait for the promise
-      
-          if (user) {
-            console.log("data", user); // User data will be in `user` variable
-            response.json({
-              message: 'User successfully retrieved',
-              data: user,
-              status: true,
-            });
-          } else {
-            response.json({
-              message: 'User not found',
-              status: false,
-            });
-          }
+            const { id } = request.query; // Assuming you're using `id` from the query string
+
+            //   Validate ID format (optional, but recommended for security)
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return response.json({
+                    message: 'Invalid user ID format',
+                    status: false,
+                });
+            }
+
+            const user = await userModel.findById(id); // Use await to wait for the promise
+
+            if (user) {
+                console.log("data", user); // User data will be in `user` variable
+                response.json({
+                    message: 'User successfully retrieved',
+                    data: user,
+                    status: true,
+                });
+            } else {
+                response.json({
+                    message: 'User not found',
+                    status: false,
+                });
+            }
         } catch (error) {
-          console.error(error); // Log the error for debugging
-          response.json({
-            message: 'Internal error',
-            status: false,
-          });
+            console.error(error); // Log the error for debugging
+            response.json({
+                message: 'Internal error',
+                status: false,
+            });
         }
-      },
-      
+    },
+
     // userCreate: async (request, response) => {
     //     try {
     //         // console.log(request.body)
@@ -478,15 +567,15 @@ const UserController = {
         try {
             const { id, firstName, email, } = request.body;
 
-            if (!id || !firstName  || !email ) {
+            if (!id || !firstName || !email) {
                 return response.json({
                     message: 'Required fields are missing',
                     status: false,
                 });
             }
 
-            const objToSend ={
-                firstName:firstName,
+            const objToSend = {
+                firstName: firstName,
                 email
             }
             const updatedUser = await userModel.findByIdAndUpdate(
