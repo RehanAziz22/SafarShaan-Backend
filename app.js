@@ -15,7 +15,7 @@ const bcrypt = require('bcryptjs');
 const UserController = require('./controller/userController.js');
 const PORT = process.env.PORT || 5000;
 
-const DBURI = "mongodb+srv://fyp:admin@cluster0.6ioixy5.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+const DBURI = process.env.DBURI
  //"mongodb+srv://rehan:admin@cluster0.j1r6kfp.mongodb.net/?retryWrites=true&w=majority";
 mongoose.connect(DBURI)
     .then((res) => console.log("mongo DB connected"))
