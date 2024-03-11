@@ -28,12 +28,12 @@ const UserController = {
                 });
             }
             const objToSend = {
-                mobile_number: mobileNumber,
+                mobileNumber: mobileNumber,
                 category: "user",
                 is_verified: false
             };
 
-            const existingUser = await userModel.findOne({ mobile_number: mobileNumber });
+            const existingUser = await userModel.findOne({ mobileNumber });
 
             if (existingUser) {
                 return response.json({
@@ -134,7 +134,7 @@ const UserController = {
     //             last_name: lastName,
     //             email,
     //             password: hashPassword,
-    //             mobile_number: mobileNumber,
+    //             mobileNumber: mobileNumber,
     //             category,
     //             is_verified: false
     //         };
@@ -221,7 +221,7 @@ const UserController = {
     //             last_name: lastName,
     //             email,
     //             password: hashPassword,
-    //             mobile_number: mobileNumber,
+    //             mobileNumber: mobileNumber,
     //             category,
     //         };
 
@@ -296,7 +296,7 @@ const UserController = {
                 });
             }
 
-            const user = await userModel.findOne({ mobile_number: mobileNumber }); // Use async/await for findOne
+            const user = await userModel.findOne({ mobileNumber: mobileNumber }); // Use async/await for findOne
 
             if (!user) {
                 return response.json({
