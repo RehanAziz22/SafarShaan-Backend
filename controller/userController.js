@@ -422,7 +422,7 @@ const UserController = {
                 return response.json({
                     message: 'OTP Matched User successfully Verified',
                     status: true,
-                    user,
+                    otpUser,
                 });
             } else {
                 return response.json({
