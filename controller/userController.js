@@ -14,7 +14,24 @@ require('dotenv').config();
 // const twilioClient = new twilio(accountSid, authToken);
 
 const UserController = {
+    getAllUsers: async (request, response) => {
+        try {
+            // Retrieve all users from the database
+            const users = await userModel.find();
 
+            // Check if there are no users found
+            if (!users || users.length === 0) {
+                return response.status(404).json({ message: 'No users found' });
+            }
+
+            // Return the array of users
+            response.status(200).json(users);
+        } catch (error) {
+            console.error(error);
+            // Return an error response if something goes wrong
+            response.status(500).json({ message: 'Internal server error' });
+        }
+    },
     userSignUpMobileNumber: async (request, response) => {
         try {
             console.log(request.body);
@@ -24,7 +41,7 @@ const UserController = {
             if (!mobileNumber) {
                 return response.json({
                     message: 'Required fields are missing',
-                    status: false,
+                    success: false,
                 });
             }
             const objToSend = {
@@ -38,7 +55,7 @@ const UserController = {
             if (existingUser) {
                 return response.json({
                     message: 'Phone Number already exists Please use another',
-                    status: false,
+                    success: false,
                 });
             }
 
@@ -54,7 +71,7 @@ const UserController = {
 
             return response.status(200).json({
                 success: true,
-                msg: "OTP Send Successfully",
+                message: "OTP Send Successfully",
                 user,
                 userOtp
             })
@@ -63,7 +80,7 @@ const UserController = {
             console.error(error);
             return response.json({
                 message: 'Internal server error',
-                status: false,
+                success: false,
             });
         }
     },
@@ -76,7 +93,7 @@ const UserController = {
             // if (!mobileNumber || !/^\d{10}$/.test(mobileNumber)) {
             //     return response.status(400).json({
             //         success: false,
-            //         msg: 'Invalid mobile number format. Please provide a 10-digit number.'
+            //         message: 'Invalid mobile number format. Please provide a 10-digit number.'
             //     });
             // }
 
@@ -88,7 +105,7 @@ const UserController = {
             if (existingOtp && (currentTime - existingOtp.otpExpiration) < resendWindow) {
                 return response.status(429).json({
                     success: false,
-                    msg: 'OTP resend limit reached. Please try again in 1 minute.'
+                    message: 'OTP resend limit reached. Please try again in 1 minute.'
                 });
             }
 
@@ -109,14 +126,14 @@ const UserController = {
 
             return response.status(200).json({
                 success: true,
-                msg: 'OTP resent successfully.',
+                message: 'OTP resent successfully.',
                 data: updatedUserOtp
             });
         } catch (error) {
             console.error(error);
             response.status(500).json({
                 success: false,
-                msg: 'Internal server error.'
+                message: 'Internal server error.'
             });
         }
     },
@@ -127,17 +144,17 @@ const UserController = {
             if (!pin) {
                 return response.status(400).json({ // Use a more specific error code
                     message: 'Pin is required.',
-                    status: false,
+                    success: false,
                 });
             } else if (pin.length < 4) {
                 return response.status(400).json({
                     message: 'Pin must be at least 4 digits long.',
-                    status: false,
+                    success: false,
                 });
             } else if (pin.length > 4) {
                 return response.status(400).json({
                     message: 'Pin cannot exceed 4 digits.',
-                    status: false,
+                    success: false,
                 });
             }
             const hashPin = await bcrypt.hash(pin, 10);
@@ -150,20 +167,20 @@ const UserController = {
             if (!updatedUser) {
                 return response.json({
                     message: 'User not found',
-                    status: false,
+                    success: false,
                 });
             }
 
             return response.json({
                 message: 'Pin successfully create and updated to DB ' + pin,
-                status: true,
+                success: true,
                 data: hashPin
             });
         } catch (error) {
             console.error(error);
             return response.json({
                 message: 'Internal server error',
-                status: false,
+                success: false,
             });
         }
     },
@@ -177,7 +194,7 @@ const UserController = {
     //         if (!firstName || !lastName || !email || !password || !mobileNumber || !category) {
     //             return response.json({
     //                 message: 'Required fields are missing',
-    //                 status: false,
+    //                 success: false,
     //             });
     //         }
 
@@ -198,7 +215,7 @@ const UserController = {
     //         if (existingUser) {
     //             return response.json({
     //                 message: 'Email already exists',
-    //                 status: false,
+    //                 success: false,
     //             });
     //         }
 
@@ -235,22 +252,22 @@ const UserController = {
 
     //         return response.json({
     //             message: 'Please verify your email to complete signup',
-    //             status: true,
+    //             success: true,
     //         });
     //     } catch (error) {
     //         console.error(error);
     //         return response.json({
     //             message: 'Internal server error',
-    //             status: false,
+    //             success: false,
     //         });
     //     }
     // },
-    verifyMail: async (req, res) => {
+    verifyMail: async (request, response) => {
         try {
 
-            const updateInfo = await userModel.updateOne({ _id: req.query.id }, { $set: { is_verified: true } })
+            const updateInfo = await userModel.updateOne({ _id: request.query.id }, { $set: { is_verified: true } })
             console.log(updateInfo)
-            res.render("email-verified");
+            response.render("email-verified");
         } catch (error) {
             console.log(error)
         }
@@ -264,7 +281,7 @@ const UserController = {
     //         if (!firstName || !lastName || !email || !password || !mobileNumber || !category) {
     //             return response.json({
     //                 message: 'Required fields are missing',
-    //                 status: false,
+    //                 success: false,
     //             });
     //         }
 
@@ -284,7 +301,7 @@ const UserController = {
     //         if (existingUser) {
     //             return response.json({
     //                 message: 'Email already exists',
-    //                 status: false,
+    //                 success: false,
     //             });
     //         }
 
@@ -319,13 +336,13 @@ const UserController = {
 
     //             return response.json({
     //                 message: 'User successfully signed up',
-    //                 status: true,
+    //                 success: true,
     //                 user: newUser,
     //             });
     //         } else {
     //             return response.json({
     //                 message: 'Please Verify Your Mail',
-    //                 status: false,
+    //                 success: false,
     //                 user: newUser,
     //             });
     //         }
@@ -333,7 +350,7 @@ const UserController = {
     //         console.error(error); // Log the error for debugging
     //         return response.json({
     //             message: 'Internal server error',
-    //             status: false,
+    //             success: false,
     //         });
     //     }
     // },
@@ -346,7 +363,7 @@ const UserController = {
             if (!mobileNumber) {
                 return response.json({
                     message: 'Required fields are missing',
-                    status: false,
+                    success: false,
                 });
             }
 
@@ -355,19 +372,19 @@ const UserController = {
             if (!user) {
                 return response.json({
                     message: 'Phone no doest not registered',
-                    status: false,
+                    success: false,
                 });
             }
             return response.json({
                 message: 'Phone number matched',
-                status: true,
-                user,
+                success: true,
+                data:user,
             });
         } catch (error) {
             console.error(error); // Log the error for debugging
             return response.json({
                 message: 'Internal server error',
-                status: false,
+                success: false,
             });
         }
     },
@@ -386,21 +403,21 @@ const UserController = {
             if (!isPinMatch) {
                 return response.json({
                     message: 'Invalid Pin',
-                    status: false,
+                    success: false,
                 });
             }
 
             return response.json({
                 message: 'User successfully logged in',
-                status: true,
-                user,
+                success: true,
+                data:user,
             });
         }
         catch (error) {
             console.error(error); // Log the error for debugging
             return response.json({
                 message: 'Internal server error',
-                status: false,
+                success: false,
             });
         }
     },
@@ -421,13 +438,13 @@ const UserController = {
 
                 return response.json({
                     message: 'OTP Matched User successfully Verified',
-                    status: true,
-                    otpUser,
+                    success: true,
+                    data: otpUser,
                 });
             } else {
                 return response.json({
                     message: 'Invalid OTP',
-                    status: false,
+                    success: false,
                 });
             }
         }
@@ -435,7 +452,7 @@ const UserController = {
             console.error(error); // Log the error for debugging
             return response.json({
                 message: 'Internal server error',
-                status: false,
+                success: false,
             });
         }
     },
@@ -448,7 +465,7 @@ const UserController = {
     //         if (!email || !password) {
     //             return response.json({
     //                 message: 'Required fields are missing',
-    //                 status: false,
+    //                 success: false,
     //             });
     //         }
 
@@ -457,7 +474,7 @@ const UserController = {
     //         if (!user) {
     //             return response.json({
     //                 message: 'Invalid credentials',
-    //                 status: false,
+    //                 success: false,
     //             });
     //         }
 
@@ -466,20 +483,20 @@ const UserController = {
     //         if (!isPasswordMatch) {
     //             return response.json({
     //                 message: 'Invalid credentials',
-    //                 status: false,
+    //                 success: false,
     //             });
     //         }
 
     //         return response.json({
     //             message: 'User successfully logged in',
-    //             status: true,
+    //             success: true,
     //             user,
     //         });
     //     } catch (error) {
     //         console.error(error); // Log the error for debugging
     //         return response.json({
     //             message: 'Internal server error',
-    //             status: false,
+    //             success: false,
     //         });
     //     }
     // },
@@ -491,7 +508,7 @@ const UserController = {
             if (!mongoose.Types.ObjectId.isValid(id)) {
                 return response.json({
                     message: 'Invalid user ID format',
-                    status: false,
+                    success: false,
                 });
             }
 
@@ -502,19 +519,19 @@ const UserController = {
                 response.json({
                     message: 'User successfully retrieved',
                     data: user,
-                    status: true,
+                    success: true,
                 });
             } else {
                 response.json({
                     message: 'User not found',
-                    status: false,
+                    success: false,
                 });
             }
         } catch (error) {
             console.error(error); // Log the error for debugging
             response.json({
                 message: 'Internal error',
-                status: false,
+                success: false,
             });
         }
     },
@@ -527,7 +544,7 @@ const UserController = {
     //         if (!firstName || !lastName || !email || !password || !category) {
     //             response.json({
     //                 message: `Required fields are missing`,
-    //                 status: false,
+    //                 success: false,
     //             });
     //             return;
     //         }
@@ -546,7 +563,7 @@ const UserController = {
     //         return response.json({
     //             message: 'User successfully created',
     //             data: user,
-    //             status: true,
+    //             success: true,
     //         });
     //     } catch (error) {
     //         console.error(error); // Log the error for detailed debugging
@@ -558,7 +575,7 @@ const UserController = {
 
     //         return response.json({
     //             message: errorMessage,
-    //             status: false,
+    //             success: false,
     //         });
     //     }
     // },
@@ -570,7 +587,7 @@ const UserController = {
             if (!id || !firstName || !email) {
                 return response.json({
                     message: 'Required fields are missing',
-                    status: false,
+                    success: false,
                 });
             }
 
@@ -587,20 +604,20 @@ const UserController = {
             if (!updatedUser) {
                 return response.json({
                     message: 'User not found',
-                    status: false,
+                    success: false,
                 });
             }
 
             return response.json({
                 message: 'User successfully updated',
                 data: updatedUser,
-                status: true,
+                success: true,
             });
         } catch (error) {
             console.error(error);
             return response.json({
                 message: 'Internal server error',
-                status: false,
+                success: false,
             });
         }
     },
@@ -611,7 +628,7 @@ const UserController = {
             if (!id) {
                 return response.json({
                     message: 'User ID is required',
-                    status: false,
+                    success: false,
                 });
             }
 
@@ -620,19 +637,19 @@ const UserController = {
             if (!deletedUser) {
                 return response.json({
                     message: 'User not found',
-                    status: false,
+                    success: false,
                 });
             }
 
             return response.json({
                 message: 'User successfully deleted',
-                status: true,
+                success: true,
             });
         } catch (error) {
             console.error(error);
             return response.json({
                 message: 'Internal server error',
-                status: false,
+                success: false,
             });
         }
     },
@@ -656,13 +673,13 @@ const UserController = {
 
     //         return res.status(200).json({
     //             success: true,
-    //             msg: "OTP Sent Successfully",
+    //             message: "OTP Sent Successfully",
     //         });
     //     } catch (error) {
     //         console.error("Error sending OTP:", error);
     //         return res.status(400).json({
     //             success: false,
-    //             msg: "Something went wrong. Please try again later.", // Generic error message for user
+    //             message: "Something went wrong. Please try again later.", // Generic error message for user
     //         });
     //     }
     // },
