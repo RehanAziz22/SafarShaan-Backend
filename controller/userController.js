@@ -21,15 +21,22 @@ const UserController = {
 
             // Check if there are no users found
             if (!users || users.length === 0) {
-                return response.status(404).json({ message: 'No users found' });
+                return response.status(404).json({
+                    message: 'No users found'
+                });
             }
 
             // Return the array of users
-            response.status(200).json(users);
+            response.status(200).json({
+                message: "user scuuessfully get",
+                data: users
+            });
         } catch (error) {
             console.error(error);
             // Return an error response if something goes wrong
-            response.status(500).json({ message: 'Internal server error' });
+            response.status(500).json({
+                message: 'Internal server error'
+            });
         }
     },
     userSignUpMobileNumber: async (request, response) => {
@@ -378,7 +385,7 @@ const UserController = {
             return response.json({
                 message: 'Phone number matched',
                 success: true,
-                data:user,
+                data: user,
             });
         } catch (error) {
             console.error(error); // Log the error for debugging
@@ -410,7 +417,7 @@ const UserController = {
             return response.json({
                 message: 'User successfully logged in',
                 success: true,
-                data:user,
+                data: user,
             });
         }
         catch (error) {
