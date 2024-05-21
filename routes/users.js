@@ -26,6 +26,7 @@ router.post("/login", UserController.userLoginViaPhone)
 
 //single user get        //63d2914f4f578f168a217af1
 router.get("/user/:id", UserController.singleUserGet);
+router.get("/users", UserController.getAllUsers);
 
 //user update
 router.put("/user", UserController.userUpdate);

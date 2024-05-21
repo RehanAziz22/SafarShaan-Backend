@@ -14,7 +14,22 @@ require('dotenv').config();
 // const twilioClient = new twilio(accountSid, authToken);
 
 const UserController = {
-
+    getAllUsers: async (request, response) => {
+        try {
+            const users = await userModel.find(); // Fetch all users from the database
+            return response.status(200).json({
+                message: 'Users retrieved successfully',
+                status: true,
+                data: users,
+            });
+        } catch (error) {
+            console.error(error); // Log the error for debugging
+            return response.status(500).json({
+                message: 'Internal server error',
+                status: false,
+            });
+        }
+    },
     userSignUpMobileNumber: async (request, response) => {
         try {
             console.log(request.body);
