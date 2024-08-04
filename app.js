@@ -2,6 +2,7 @@ const express = require('express')
 const userRouter = require('./routes/users.js')
 const otpRouter = require('./routes/phone-otp.js')
 const bikeRouter = require('./routes/bike.js')
+const adminRouter = require('./routes/admin.js')
 
 const app = express()
 
@@ -36,6 +37,8 @@ app.use(express.json())
 app.use('/api',userRouter)
 // app.use('/api',otpRouter)
 app.use('/api',bikeRouter)
+
+app.use('/api',adminRouter );
 
 app.get('/',(req,res)=>{
     res.send("SaffarShan Working Fine")
