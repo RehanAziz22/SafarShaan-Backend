@@ -7,7 +7,7 @@ const adminRouter = require('./routes/admin.js')
 const app = express()
 
 
-const sendMail = require("./controller/sendMail");
+const sendMail = require("./controller/sendMail.js");
 
 
 require("dotenv").config();
