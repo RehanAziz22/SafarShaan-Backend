@@ -4,52 +4,132 @@ const bikeModel = require("../model/bikeSchema.js");
 
 const BikeController = {
     // Controller function to get all bike details
-  getAllBikes: async (req, res) => {
-    try {
-      // Retrieve all bikes from the database
-      const bikes = await bikeModel.find();
-
-      // Check if there are no bikes found
-      if (!bikes || bikes.length === 0) {
-        return res.status(404).json({ message: 'No bikes found' });
-      }
-
-      // Return the array of bikes
-      res.status(200).json(bikes);
-    } catch (error) {
-      console.error(error);
-      // Return an error response if something goes wrong
-      res.status(500).json({ message: 'Internal server error' });
-    }
-  },
-    addBike: async (request, response) => {
+    getAllBikes: async (req, res) => {
         try {
-            const { model, status, location, lastServicedOn, ratePerHour, features, isElectric, fuel,bikeId } = request.body;
+            const bikes = await bikeModel.find();
 
-            // Basic validation could be added here as needed
-            const newBike = await bikeModel.create({
-                bikeId,
-                model,
-                status,
-                location,
-                lastServicedOn,
-                ratePerHour,
-                features,
-                isElectric,
-                fuel
-            });
+            if (bikes.length === 0) {
+                return res.status(404).json({ message: 'No bikes found' });
+            }
 
-            return response.status(200).json({
-                message: 'Bike added successfully',
-                data: newBike,
-                success: true,
-            });
+            res.status(200).json(bikes);
         } catch (error) {
             console.error(error);
-            return response.status(500).json({
-                message: 'Internal server error',
-                success: false,
-            });
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+    // addBike: async (req, res) => {
+    //     try {
+    //         const { plateNo, model, status, location, fuelLevel,
+    //             lastMaintenanceDate, additionalInfo, rentedBy,
+    //             totalEarnings, totalCosts, ratePerMin, ratePerKm,
+    //             fuel, fuelConsumption, mileage, fuelEfficiency,
+    //             rideHistory, } = req.body;
+
+    //         // Generate default location
+    //         const defaultLocation = {
+    //             type: 'Point',
+    //             coordinates: generateRandomCoordinates(minLat, maxLat, minLng, maxLng) // Replace with your desired coordinates
+    //         };
+
+    //         const objToSend = {
+    //             plateNo,
+    //             model,
+    //             status: status || 'available', // Default status if not provided
+    //             location: location || defaultLocation,
+    //             fuelLevel,
+    //             lastMaintenanceDate,
+    //             additionalInfo,
+    //             rentedBy,
+    //             totalEarnings,
+    //             totalCosts,
+    //             ratePerMin,
+    //             ratePerKm,
+    //             fuel,
+    //             fuelConsumption,
+    //             mileage,
+    //             fuelEfficiency,
+    //             rideHistory,
+    //         }
+
+    //         // if (!plateNo && !model) {
+    //         //     return response.json({
+    //         //         message: 'Required fields are missing',
+    //         //         status: false,
+    //         //     });
+    //         // }
+    //         const newBike = await bikeModel.create(objToSend);
+
+    //         res.status(201).json({ message: 'Bike added successfully', data: newBike });
+    //     } catch (error) {
+    //         console.error(error);
+    //         res.status(500).json({ message: 'Internal server error' });
+    //     }
+    // },
+
+
+    addBike: async (req, res) => {
+        try {
+            const { plateNo, model, status, location, fuelLevel,
+                lastMaintenanceDate, additionalInfo, rentedBy,
+                totalEarnings, totalCosts, ratePerMin, ratePerKm,
+                fuel, fuelConsumption, mileage, fuelEfficiency,
+                rideHistory,markerVisible } = req.body;
+
+            // Check if required fields are provided
+            if (!plateNo || !model) {
+                return res.status(400).json({
+                    message: 'Required fields are missing: plateNo and model are mandatory',
+                    status: false,
+                });
+            }
+
+            const defaultLocation = {
+                type: 'Point',
+                coordinates: [24.8607, 67.0111]
+            };
+
+            const objToSend = {
+                plateNo,
+                model,
+                status: status || 'available', // Default status if not provided
+                location: location || defaultLocation,
+                fuelLevel,
+                lastMaintenanceDate,
+                additionalInfo,
+                rentedBy,
+                totalEarnings,
+                totalCosts,
+                ratePerMin,
+                ratePerKm,
+                fuel,
+                fuelConsumption,
+                mileage,
+                fuelEfficiency,
+                rideHistory,
+                markerVisible
+            };
+            const existingBike = await bikeModel.findOne({ plateNo });
+
+            if (existingBike) {
+                return res.json({
+                    message: 'Bike already Registered',
+                    success: false,
+                });
+            }
+
+            const newBike = await bikeModel.create(objToSend);
+            res.status(201).json({ 
+                message: 'Bike added successfully', 
+                data: newBike,
+                success: true });
+
+        } catch (error) {
+            console.error('Error adding bike:', error);
+
+            
+
+            res.status(500).json({ message: 'Internal server error', error: error.message });
         }
     },
 

@@ -1,56 +1,122 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-// Define a GeoSchema for GeoJSON Point
-const GeoSchema = new Schema({
-  type: {
-    type: String,
-    default: "Point"
-  },
-  coordinates: {
-    type: [Number], // [longitude, latitude]
-    index: "2dsphere" // Create a geospatial index
-  }
-});
 
-const bikeSchema = new mongoose.Schema({
-  bikeId: {
+const bikeSchema = new Schema({
+  plateNo: {
     type: String,
     required: true,
-    unique: true,
-    index: true,
-    description: "Unique identifier assigned to the bike by the company"
+    unique: true
   },
   model: {
     type: String,
-    description: "Model name of the bike (e.g., City Bike, Mountain Bike)"
+    required: true
   },
-  location: GeoSchema,
+  location: {
+    type: {
+      type: String,
+      default: 'Point',
+      required: true
+    },
+    coordinates: {
+      type: [Number],
+      index: '2dsphere',
+      required: true
+    }
+  },
+  markerVisible:{
+    type:Boolean,
+    default:true,
+    required:true
+  },
   status: {
     type: String,
-    enum: ["available", "in_use", "under_maintenance", "reserved"],
-    // required: true,
-    default: "available",
-    // index: true, // Index for frequent status-based queries
-    description: "Current status of the bike"
+    enum: ['available', 'in_use', 'under_maintenance', 'reserved'],
+    default: 'available',
+    required: true
   },
   fuelLevel: {
     type: Number,
-    description: "Fuel level of the bike (in liters for gas bikes, percentage for electric bikes)"
+    default: 0,
+    min: 0,
+    max: 100 // Assuming percentage for electric bikes
   },
   lastMaintenanceDate: {
     type: Date,
-    description: "Date of the bike's last maintenance"
+    default: new Date()
   },
   additionalInfo: {
-    type: Object,
-    description: "Optional field for any additional information about the bike (e.g., lock code, image URL)"
+    type: Object
   },
   rentedBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "user",
-    description: "User who has currently rented the bike (if applicable)"
-  }
+    ref: 'User'
+  },
+  totalEarnings: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  totalCosts: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  ratePerMin: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
+  ratePerKm: {
+    type: Number,
+    min: 0,
+    default: 0,
+  },
+  fuel: {
+    type: String,
+    default: 'Petrol'
+  },
+  fuelConsumption: [{
+    timestamp: Date,
+    // default: new Date(),
+    fuelLevel: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100
+    }
+  }],
+  mileage: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  fuelEfficiency: {
+    type: Number, // km/liter
+    min: 0,
+    default: 0,
+  },
+  rideHistory: [{
+    startTime: Date,
+    endTime: Date,
+    // default: new Date(),
+    distance: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+    duration: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+    price: {
+      type: Number,
+      default: 0,
+      min: 0
+    }
+  }]
 });
 
+const Bike = mongoose.model('Bike', bikeSchema);
 
-module.exports = mongoose.model("bike", bikeSchema);
+module.exports = Bike;
