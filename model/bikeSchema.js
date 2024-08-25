@@ -95,6 +95,11 @@ const bikeSchema = new Schema({
     min: 0,
     default: 0,
   },
+  fuelTankCapacity: {
+    type: Number, // km/liter
+    min: 0,
+    default: 0,
+  },
   rideHistory: [{
     startTime: Date,
     endTime: Date,

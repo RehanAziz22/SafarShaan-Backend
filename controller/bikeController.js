@@ -74,7 +74,7 @@ const BikeController = {
                 lastMaintenanceDate, additionalInfo, rentedBy,
                 totalEarnings, totalCosts, ratePerMin, ratePerKm,
                 fuel, fuelConsumption, mileage, fuelEfficiency,
-                rideHistory,markerVisible } = req.body;
+                rideHistory,markerVisible,fuelTankCapacity } = req.body;
 
             // Check if required fields are provided
             if (!plateNo || !model) {
@@ -107,7 +107,8 @@ const BikeController = {
                 mileage,
                 fuelEfficiency,
                 rideHistory,
-                markerVisible
+                markerVisible,
+                fuelTankCapacity
             };
             const existingBike = await bikeModel.findOne({ plateNo });
 
