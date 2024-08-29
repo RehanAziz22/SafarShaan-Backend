@@ -578,34 +578,90 @@ const UserController = {
     //     }
     // },
 
+    // userUpdate: async (request, response) => {
+    //     try {
+    //         const { id, firstName, email, } = request.body;
+
+    //         if (!id || !firstName || !email) {
+    //             return response.json({
+    //                 message: 'Required fields are missing',
+    //                 status: false,
+    //             });
+    //         }
+
+    //         const objToSend = {
+    //             firstName: firstName,
+    //             email
+    //         }
+    //         const updatedUser = await userModel.findByIdAndUpdate(
+    //             id,
+    //             { $set: objToSend },
+    //             { new: true } // Return the updated user document
+    //         );
+
+    //         if (!updatedUser) {
+    //             return response.json({
+    //                 message: 'User not found',
+    //                 status: false,
+    //             });
+    //         }
+
+    //         return response.json({
+    //             message: 'User successfully updated',
+    //             data: updatedUser,
+    //             status: true,
+    //         });
+    //     } catch (error) {
+    //         console.error(error);
+    //         return response.json({
+    //             message: 'Internal server error',
+    //             status: false,
+    //         });
+    //     }
+    // },
+    
     userUpdate: async (request, response) => {
         try {
-            const { id, firstName, email, } = request.body;
-
-            if (!id || !firstName || !email) {
+            const { id, firstName, email, pin, mobileNumber, category, is_verified, location, accountBalance,plateNo,rideHistory } = request.body;
+    
+            // Ensure required fields are present
+            // if (!id || !firstName || !email || !pin || !mobileNumber) {
+                if (!id || !mobileNumber) {
                 return response.json({
                     message: 'Required fields are missing',
                     status: false,
                 });
             }
-
+    
+            // Prepare the object to update
             const objToSend = {
-                firstName: firstName,
-                email
-            }
+                firstName,
+                email,
+                pin,
+                mobileNumber,
+                category,
+                is_verified,
+                location,
+                accountBalance,
+                plateNo,
+                rideHistory
+            };
+    
+            // Update the user in the database
             const updatedUser = await userModel.findByIdAndUpdate(
                 id,
                 { $set: objToSend },
                 { new: true } // Return the updated user document
             );
-
+    
+            // Handle user not found
             if (!updatedUser) {
                 return response.json({
                     message: 'User not found',
                     status: false,
                 });
             }
-
+    
             return response.json({
                 message: 'User successfully updated',
                 data: updatedUser,
@@ -619,6 +675,8 @@ const UserController = {
             });
         }
     },
+    
+    
     userDelete: async (request, response) => {
         try {
             const { id } = request.body;
@@ -651,6 +709,39 @@ const UserController = {
             });
         }
     },
+
+    updateUserStatusOrLocation: async (request, response) => {
+        try {
+            const { id } = request.params; // Assuming you're using the user's ID in the URL parameters
+            const { status, location } = request.body;
+    
+            // Find the user by ID and update their status and/or location
+            const updatedUser = await userModel.findByIdAndUpdate(
+                id, 
+                { status, location }, 
+                { new: true } // Return the updated user document
+            );
+    
+            if (!updatedUser) {
+                return response.status(404).json({
+                    message: 'User not found',
+                    success: false,
+                });
+            }
+    
+            return response.status(200).json({
+                message: 'User status or location updated successfully',
+                data: updatedUser,
+                success: true,
+            });
+        } catch (error) {
+            console.error(error);
+            return response.status(500).json({
+                message: 'Internal server error',
+                success: false,
+            });
+        }
+    }
     // sendOTP: async (req, res) => {
     //     try {
     //         const { mobileNumber } = req.body;

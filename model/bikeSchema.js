@@ -23,15 +23,20 @@ const bikeSchema = new Schema({
       required: true
     }
   },
-  markerVisible:{
-    type:Boolean,
-    default:true,
-    required:true
+  markerVisible: {
+    type: Boolean,
+    default: true,
+    required: true
   },
   status: {
     type: String,
     enum: ['available', 'in_use', 'under_maintenance', 'reserved'],
     default: 'available',
+    required: true
+  },
+  rideStartEnd: {
+    type: Boolean,
+    default: false,
     required: true
   },
   fuelLevel: {
@@ -49,7 +54,8 @@ const bikeSchema = new Schema({
   },
   rentedBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    default:null,
   },
   totalEarnings: {
     type: Number,
@@ -104,6 +110,14 @@ const bikeSchema = new Schema({
     startTime: Date,
     endTime: Date,
     // default: new Date(),
+    pickUpAddress: {
+      type: String,
+      required: true
+    },
+    destinationAddress: {
+      type: String,
+      required: true
+    },
     distance: {
       type: Number,
       default: 0,
@@ -118,7 +132,22 @@ const bikeSchema = new Schema({
       type: Number,
       default: 0,
       min: 0
-    }
+    },
+    pickUpCoordinates: {
+      type: [Number], // [longitude, latitude]
+      index: '2dsphere',
+      required: true
+    },
+    destinationCoordinates: {
+      type: [Number], // [longitude, latitude]
+      index: '2dsphere',
+      required: true
+    },
+    rentedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default:null,
+    },
   }]
 });
 

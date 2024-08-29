@@ -74,7 +74,7 @@ const BikeController = {
                 lastMaintenanceDate, additionalInfo, rentedBy,
                 totalEarnings, totalCosts, ratePerMin, ratePerKm,
                 fuel, fuelConsumption, mileage, fuelEfficiency,
-                rideHistory,markerVisible,fuelTankCapacity } = req.body;
+                rideHistory,markerVisible,fuelTankCapacity,rideStartEnd } = req.body;
 
             // Check if required fields are provided
             if (!plateNo || !model) {
@@ -108,7 +108,8 @@ const BikeController = {
                 fuelEfficiency,
                 rideHistory,
                 markerVisible,
-                fuelTankCapacity
+                fuelTankCapacity,
+                rideStartEnd
             };
             const existingBike = await bikeModel.findOne({ plateNo });
 
@@ -138,7 +139,8 @@ const BikeController = {
         try {
             const { id } = request.params; // assuming the bike ID is sent as a URL parameter
             const updateData = request.body;
-
+            console.log("Updating bike with ID:", id); // Log bike ID
+            console.log("Update data:", updateData); // Log the data being sent
             const updatedBike = await bikeModel.findByIdAndUpdate(id, updateData, { new: true });
 
             if (!updatedBike) {

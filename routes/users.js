@@ -39,4 +39,8 @@ router.put("/user", UserController.userUpdate);
 router.delete("/user", UserController.userDelete);
 //mail verify
 router.get("/verify",UserController.verifyMail)
+
+
+// Updating the status or location of a bike
+router.patch("/user/status-location/:id", UserController.updateUserStatusOrLocation);
 module.exports = router
