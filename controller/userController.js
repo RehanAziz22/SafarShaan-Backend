@@ -77,8 +77,8 @@ const UserController = {
             })
         }
         catch (error) {
-            console.error(error);
-            return response.json({
+            console.error("Error in userSignUpMobileNumber:", error); // Detailed error logging
+            return response.status(500).json({
                 message: 'Internal server error',
                 status: false,
             });
