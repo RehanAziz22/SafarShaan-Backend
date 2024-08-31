@@ -4,16 +4,16 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     firstName: {
         type: String,
-        required: true
+        // required: true
     },
     email: {
         type: String,
-        required: true,
+        // required: true,
         unique: true
     },
     pin: {
         type: String,
-        required: true
+        // required: true
     },
     mobileNumber: {
         type: String,
@@ -32,12 +32,12 @@ const userSchema = new Schema({
         type: {
             type: String,
             default: 'Point',
-            required: true
+            // required: true
         },
         coordinates: {
             type: [Number],
             index: '2dsphere',
-            required: true
+            // required: true
         }
     },
     accountBalance: {
@@ -47,7 +47,7 @@ const userSchema = new Schema({
     },
     plateNo: {
         type: String,
-        required: true,
+        // required: true,
         unique: true,
         default: null
     },

@@ -61,9 +61,11 @@ const UserController = {
             const otp = 1234
             // const otp = otpGenerator.generate(6, { lowerCaseAlphabets: false, specialChars: false, upperCaseAlphabets: false, digits: true })
             const cDate = new Date();
+            const otpExpiration = new Date(cDate.getTime() + 15 * 60 * 1000); // 15 minutes expiration
+
             const userOtp = await otpModel.findOneAndUpdate(
                 { mobileNumber },
-                { otp, otpExpiration: new Date(cDate.getDate()) },
+                { otp, otpExpiration },
                 { upsert: true, new: true, setDefaultOnInsert: true }
             )
 
