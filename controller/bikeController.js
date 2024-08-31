@@ -167,7 +167,12 @@ const BikeController = {
     deleteBike: async (request, response) => {
         try {
             const { id } = request.params; // assuming the bike ID is sent as a URL parameter
-
+            if (!id) {
+                return response.json({
+                    message: 'Bike ID is required',
+                    status: false,
+                });
+            }
             const deletedBike = await bikeModel.findByIdAndDelete(id);
 
             if (!deletedBike) {

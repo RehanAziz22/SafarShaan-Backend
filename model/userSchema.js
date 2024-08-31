@@ -51,7 +51,7 @@ const userSchema = new Schema({
         type: String,
         // required: true,
         // unique: true,
-        default: null
+        // default: null
     },
     rideHistory: [{
         startTime: {
