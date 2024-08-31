@@ -9,7 +9,9 @@ const userSchema = new Schema({
     email: {
         type: String,
         // required: true,
-        // unique: true
+        // unique: true,
+        // default:"@gmail.com"
+        // sparse: true // Allows multiple `null` values
     },
     pin: {
         type: String,
@@ -48,7 +50,7 @@ const userSchema = new Schema({
     plateNo: {
         type: String,
         // required: true,
-        unique: true,
+        // unique: true,
         default: null
     },
     rideHistory: [{
