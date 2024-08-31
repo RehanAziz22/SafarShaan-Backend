@@ -93,6 +93,16 @@ const userSchema = new Schema({
             required: true,
             default: null
         },
+        pickUpCoordinates: {
+            type: [Number], // [longitude, latitude]
+            index: '2dsphere',
+            required: true
+          },
+          destinationCoordinates: {
+            type: [Number], // [longitude, latitude]
+            index: '2dsphere',
+            required: true
+          },
     }]
 });
 
